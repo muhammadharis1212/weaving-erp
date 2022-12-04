@@ -5,6 +5,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Users } from './users/entities/users.entity';
 
 @Module({
   imports: [
@@ -19,12 +20,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       useFactory: (configService: ConfigService) => {
         return {
           type: 'postgres',
-          host: 'localhost',
+          host: configService.get('POSTGRES_HOST'),
           port: configService.get('POSTGRES_PORT'),
           username: configService.get('POSTGRES_USER'),
           password: configService.get('POSTGRES_PASSWORD'),
           database: configService.get('POSTGRES_DATABASE'),
-          entities: [],
+          entities: [Users],
           synchronize: true,
         };
       },
