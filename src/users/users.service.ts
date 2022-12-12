@@ -9,21 +9,55 @@ import { Repository } from 'typeorm';
 export class UsersService {
   constructor(@InjectRepository(Users) private repo: Repository<Users>) {}
   create(createUserDto: CreateUserDto) {
-    const { name, email, password } = createUserDto;
-    const user = this.repo.create({ name, email, password });
+    const {
+      name,
+      email,
+      password,
+      phone,
+      addressLine1,
+      addressLine2,
+      state,
+      city,
+      postal,
+      companyName,
+    } = createUserDto;
+    const user = this.repo.create({
+      name,
+      email,
+      password,
+      phone,
+      addressLine1,
+      addressLine2,
+      state,
+      city,
+      postal,
+      companyName,
+    });
     return this.repo.save(user);
   }
 
   findAll() {
-    return `This action returns all users`;
+    return this.repo.find({ relations: { vendors: true } });
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} user`;
+    return this.repo.findOne({
+      where: {
+        id,
+      },
+      relations: ['vendors'],
+    });
+  }
+  findByEmail(email: string) {
+    return this.repo.findOneBy({ email });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    const user = await this.findOne(id);
+    if (!user) throw new Error('User not found');
+    console.log('In userService', updateUserDto);
+    Object.assign(user, updateUserDto);
+    return this.repo.save(user);
   }
 
   remove(id: number) {

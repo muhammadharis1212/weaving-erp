@@ -1,31 +1,37 @@
-import { type } from 'os';
-import { Vendor } from 'src/vendors/entities/vendor.entity';
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Users } from 'src/users/entities/users.entity';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+
 @Entity()
-export class Users {
+export class Vendor {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column({ nullable: true })
-  name: string;
-  @Column({ unique: true })
-  email: string;
+
   @Column()
-  password: string;
+  name: string;
+
+  @Column({ unique: true, nullable: true })
+  email: string;
+
   @Column({ nullable: true })
   phone: string;
+
   @Column({ nullable: true })
-  companyName: string;
+  vendorCompanyName: string;
+
   @Column({ nullable: true })
   addressLine1: string;
+
   @Column({ nullable: true })
   addressLine2: string;
+
   @Column({ nullable: true })
   state: string;
+
   @Column({ nullable: true })
   city: string;
+
   @Column({ nullable: true })
   postal: string;
 
-  @OneToMany(() => Vendor, (vendor) => vendor.user)
-  vendors: Vendor[];
+  @ManyToOne((type) => Users, (user) => user.vendors) user: Users;
 }
