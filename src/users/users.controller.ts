@@ -12,6 +12,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { serialize } from 'src/interceptor/serialize/serialize.interceptor';
+import { CurrentAuthUser } from './decorators/current-auth-user.decorator';
 
 @serialize(UpdateUserDto)
 @Controller('users')

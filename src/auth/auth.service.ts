@@ -10,7 +10,6 @@ export class AuthService {
   ) {}
   //Validate user
   async validateUser(email: string, pass: string): Promise<any> {
-    console.log('In Auth service validateUser function');
     const user = await this.usersService.findByEmail(email);
     if (user && user.password === pass) {
       const { password, ...result } = user;
@@ -20,8 +19,9 @@ export class AuthService {
   }
   //sign jwt token
   async login(user: any) {
+    console.log('3-In login method of auth service');
+
     const payload = { email: user.email, sub: user.id };
-    console.log('payload : ', payload);
     return {
       access_token: this.jwtService.sign(payload),
     };

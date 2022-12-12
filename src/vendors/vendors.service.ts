@@ -7,10 +7,14 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class VendorsService {
-  constructor(@InjectRepository(Vendor) private repo: Repository<Vendor>) {}
+  constructor(
+    @InjectRepository(Vendor) private vendorRepo: Repository<Vendor>,
+  ) {}
 
-  create(createVendorDto: CreateVendorDto) {
-    return 'create vendor';
+  create(createVendorDto: CreateVendorDto, user: any) {
+    const newVendor = this.vendorRepo.create(createVendorDto);
+    newVendor.user = user.id;
+    return this.vendorRepo.save(newVendor);
   }
 
   findAll() {
