@@ -4,6 +4,7 @@ import { CreateVendorDto } from './dto/create-vendor.dto';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
 import { Vendor } from './entities/vendor.entity';
 import { Repository } from 'typeorm';
+import { CurrentAuthUser } from 'src/users/decorators/current-auth-user.decorator';
 
 @Injectable()
 export class VendorsService {
@@ -18,7 +19,7 @@ export class VendorsService {
   }
 
   findAll() {
-    return `This action returns all vendors`;
+    return this.vendorRepo.find();
   }
 
   findOne(id: number) {

@@ -23,12 +23,12 @@ export class SerializeInterceptor implements NestInterceptor {
       map((data: any) => {
         console.log(
           'In interceptor map method',
-          plainToInstance(UpdateUserDto, data, {
+          plainToInstance(this.dto, data, {
             excludeExtraneousValues: true,
           }),
         );
 
-        return plainToInstance(UpdateUserDto, data, {
+        return plainToInstance(this.dto, data, {
           excludeExtraneousValues: true,
         });
       }),

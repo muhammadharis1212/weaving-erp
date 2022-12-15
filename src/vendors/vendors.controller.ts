@@ -14,11 +14,11 @@ import { UpdateVendorDto } from './dto/update-vendor.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CurrentAuthUser } from 'src/users/decorators/current-auth-user.decorator';
 
+@UseGuards(JwtAuthGuard)
 @Controller('vendors')
 export class VendorsController {
   constructor(private readonly vendorsService: VendorsService) {}
 
-  @UseGuards(JwtAuthGuard)
   @Post()
   create(
     @Body() createVendorDto: CreateVendorDto,
@@ -26,7 +26,7 @@ export class VendorsController {
   ) {
     return this.vendorsService.create(createVendorDto, user);
   }
-
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
     return this.vendorsService.findAll();
