@@ -4,37 +4,40 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Users } from './users/entities/users.entity';
+import { CompanyModule } from './company/company.module';
+
+import { PrismaModule } from './prisma/prisma.module';
 import { VendorsModule } from './vendors/vendors.module';
-import { Vendor } from './vendors/entities/vendor.entity';
+import { ChartofaccountsModule } from './chartofaccounts/chartofaccounts.module';
+import { BillsModule } from './bills/bills.module';
+import { ItemsModule } from './items/items.module';
+import { APP_GUARD, RouterModule } from '@nestjs/core';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 
 @Module({
   imports: [
     UsersModule,
     AuthModule,
+    PrismaModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
-    TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        return {
-          type: 'postgres',
-          host: configService.get('POSTGRES_HOST'),
-          port: configService.get('POSTGRES_PORT'),
-          username: configService.get('POSTGRES_USER'),
-          password: configService.get('POSTGRES_PASSWORD'),
-          database: configService.get('POSTGRES_DATABASE'),
-          entities: [Users, Vendor],
-          synchronize: true,
-        };
-      },
-    }),
+    CompanyModule,
+    PrismaModule,
     VendorsModule,
+    ChartofaccountsModule,
+    BillsModule,
+    ItemsModule,
+    RouterModule.register([{ path: 'items', module: ItemsModule }]),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}

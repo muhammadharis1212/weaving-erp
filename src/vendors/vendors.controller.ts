@@ -6,44 +6,55 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
+  ParseIntPipe,
+  Options,
+  Query,
 } from '@nestjs/common';
 import { VendorsService } from './vendors.service';
 import { CreateVendorDto } from './dto/create-vendor.dto';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiBody,
+  ApiParam,
+} from '@nestjs/swagger';
+import { FindAllVendorsDto } from './dto/findAll-vendors.dto';
+import { VendorEntity } from './entities/vendor.entity';
+import { DeleteVendorDto } from './dto/delete-vendor.dto';
 import { CurrentAuthUser } from 'src/users/decorators/current-auth-user.decorator';
 
-@UseGuards(JwtAuthGuard)
+@ApiTags('Vendors')
+@ApiBearerAuth()
 @Controller('vendors')
 export class VendorsController {
   constructor(private readonly vendorsService: VendorsService) {}
 
-  @Post()
-  create(
-    @Body() createVendorDto: CreateVendorDto,
-    @CurrentAuthUser() user: any,
-  ) {
-    return this.vendorsService.create(createVendorDto, user);
+  @Post('create')
+  create(@Body() createVendorDto: CreateVendorDto) {
+    return this.vendorsService.create(createVendorDto);
   }
-  @UseGuards(JwtAuthGuard)
+
+  @ApiOkResponse({ type: VendorEntity, isArray: true })
   @Get()
-  findAll() {
-    return this.vendorsService.findAll();
+  findAll(@CurrentAuthUser('companyId') companyId: string) {
+    console.log('Get All vendors : ', companyId);
+    return this.vendorsService.findAll(companyId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.vendorsService.findOne(+id);
+  @ApiOkResponse({ type: VendorEntity })
+  @Get(':vendorId')
+  findOne(@Param('vendorId', ParseIntPipe) vendorId: number) {
+    return this.vendorsService.findOne(vendorId);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateVendorDto: UpdateVendorDto) {
-    return this.vendorsService.update(+id, updateVendorDto);
+  @Patch(':id/update')
+  update(@Body() updateVendorDto: UpdateVendorDto) {
+    return this.vendorsService.update(updateVendorDto);
   }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.vendorsService.remove(+id);
+  @Delete()
+  remove(@Body() deleteVendorDto: DeleteVendorDto) {
+    return this.vendorsService.remove(deleteVendorDto);
   }
 }

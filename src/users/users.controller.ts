@@ -1,57 +1,53 @@
 import {
   Controller,
   Get,
-  Post,
   Body,
   Patch,
-  Param,
-  Delete,
-  ParseIntPipe,
-  UseGuards,
+  BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { serialize } from 'src/interceptor/serialize/serialize.interceptor';
 import { CurrentAuthUser } from './decorators/current-auth-user.decorator';
-import { GetUserDto } from './dto/get-user.dto';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { AuthUserDto } from './dto/auth-user.dto';
+import {
+  ApiBearerAuth,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { UserEntity } from './entities/user.entity';
 
-@UseGuards(JwtAuthGuard)
-@serialize(GetUserDto)
+@serialize(AuthUserDto)
+@ApiTags('User')
+@ApiBearerAuth()
 @Controller('user')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
-  }
-
-  // @Get()
-  // findAll() {
-  //   return this.usersService.findAll();
-  // }
-
+  @ApiOkResponse({ type: UserEntity })
+  @ApiUnauthorizedResponse({ status: 401, description: 'Unauthorized' })
   @Get()
-  findOne(@CurrentAuthUser() user: any) {
-    return this.usersService.findOne(user.id);
+  async findOne(@CurrentAuthUser('id') authUserId: string) {
+    console.log(authUserId);
+    const user = await this.usersService.findOne(authUserId);
+    if (!user)
+      throw new NotFoundException(`User with ${authUserId} does not exist.`);
+    return user;
   }
 
-  // @Get()
-  // findOne(@Param('id', ParseIntPipe) id: number) {
-  //   return this.usersService.findOne(id);
-  // }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    console.log('In route handler');
-
-    return this.usersService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  @ApiUnauthorizedResponse({ status: 401, description: 'Unauthorized' })
+  @ApiOkResponse({ type: UserEntity })
+  @Patch('update')
+  update(
+    @Body() body: UpdateUserDto,
+    @CurrentAuthUser('id') authUserId: string,
+  ) {
+    if (Object.keys(body).length === 0)
+      throw new BadRequestException('Cannot update of undefined');
+    if (body.email) throw new BadRequestException('Email cannot be change');
+    return this.usersService.update(authUserId, body);
   }
 }

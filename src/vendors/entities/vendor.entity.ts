@@ -1,37 +1,45 @@
-import { Users } from 'src/users/entities/users.entity';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { ApiProperty } from '@nestjs/swagger';
 
-@Entity()
-export class Vendor {
-  @PrimaryGeneratedColumn()
+export class VendorEntity {
+  @ApiProperty({ nullable: false })
   id: number;
 
-  @Column()
+  @ApiProperty()
   name: string;
 
-  @Column({ unique: true, nullable: true })
+  @ApiProperty()
   email: string;
 
-  @Column({ nullable: true })
+  @ApiProperty()
+  address: string;
+
+  @ApiProperty()
   phone: string;
 
-  @Column({ nullable: true })
-  vendorCompanyName: string;
-
-  @Column({ nullable: true })
-  addressLine1: string;
-
-  @Column({ nullable: true })
-  addressLine2: string;
-
-  @Column({ nullable: true })
+  @ApiProperty()
   state: string;
 
-  @Column({ nullable: true })
+  @ApiProperty()
   city: string;
 
-  @Column({ nullable: true })
-  postal: string;
+  @ApiProperty()
+  zipCode: string;
 
-  @ManyToOne((type) => Users, (user) => user.vendors) user: Users;
+  @ApiProperty()
+  country: string;
+
+  @ApiProperty()
+  reference: string;
+
+  @ApiProperty()
+  taxNo: string;
+
+  @ApiProperty()
+  createdAt: Date;
+
+  @ApiProperty()
+  updatedAt: Date;
+
+  @ApiProperty({ nullable: false })
+  companyId: string;
 }

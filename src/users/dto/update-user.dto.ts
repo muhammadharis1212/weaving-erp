@@ -1,37 +1,20 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateUserDto } from './create-user.dto';
-import { IsEmail, IsNumber, IsString } from 'class-validator';
-import { Expose, Exclude } from 'class-transformer';
+import { IsNumberString, IsString } from 'class-validator';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsString()
-  @Expose()
-  name: string;
-  @IsEmail()
-  @Exclude()
-  email: string;
+  name?: string;
+  @IsNumberString()
+  phone?: string;
   @IsString()
-  @Exclude()
-  password: string;
+  address?: string;
   @IsString()
-  @Expose()
-  phone: string;
+  state?: string;
   @IsString()
-  @Expose()
-  companyName: string;
+  city?: string;
   @IsString()
-  @Expose()
-  addressLine1: string;
+  zipCode?: string;
   @IsString()
-  @Expose()
-  addressLine2: string;
-  @IsString()
-  @Expose()
-  state: string;
-  @IsString()
-  @Expose()
-  city: string;
-  @IsString()
-  @Expose()
-  postal: string;
+  country?: string;
 }

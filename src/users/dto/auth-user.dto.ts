@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { Expose, Exclude } from 'class-transformer';
 @Injectable()
-export class GetUserDto {
-  @Exclude()
-  id: number;
+export class AuthUserDto {
+  @Expose()
+  id: string;
 
   @Expose()
   name: string;
@@ -18,13 +18,7 @@ export class GetUserDto {
   phone: string;
 
   @Expose()
-  companyName: string;
-
-  @Expose()
-  addressLine1: string;
-
-  @Expose()
-  addressLine2: string;
+  address: string;
 
   @Expose()
   state: string;
@@ -33,5 +27,8 @@ export class GetUserDto {
   city: string;
 
   @Expose()
-  postal: string;
+  zipCode: string;
+
+  @Expose()
+  country: string;
 }

@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Item" ALTER COLUMN "item_salePrice" DROP NOT NULL,
+ALTER COLUMN "item_saleAcc" DROP NOT NULL,
+ALTER COLUMN "item_cPrice" DROP NOT NULL,
+ALTER COLUMN "item_cAcc" DROP NOT NULL;

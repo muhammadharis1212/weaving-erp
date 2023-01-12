@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Users } from './entities/users.entity';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { APP_GUARD } from '@nestjs/core';
+import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Users])],
+  imports: [PrismaModule],
   controllers: [UsersController],
   providers: [UsersService],
   exports: [UsersService],

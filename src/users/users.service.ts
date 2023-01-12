@@ -1,63 +1,37 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Users } from './entities/users.entity';
-import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectRepository(Users) private repo: Repository<Users>) {}
-  create(createUserDto: CreateUserDto) {
-    const {
-      name,
-      email,
-      password,
-      phone,
-      addressLine1,
-      addressLine2,
-      state,
-      city,
-      postal,
-      companyName,
-    } = createUserDto;
-    const user = this.repo.create({
-      name,
-      email,
-      password,
-      phone,
-      addressLine1,
-      addressLine2,
-      state,
-      city,
-      postal,
-      companyName,
-    });
-    return this.repo.save(user);
+  constructor(private prisma: PrismaService) {}
+
+  create(createUserDto: Prisma.UserCreateInput) {
+    return this.prisma.user.create({ data: createUserDto });
   }
 
-  findAll() {
-    return this.repo.find({ relations: { vendors: true } });
-  }
-
-  findOne(id: number) {
-    return this.repo.findOne({
-      where: {
-        id,
-      },
-      relations: ['vendors'],
-    });
-  }
   findByEmail(email: string) {
-    return this.repo.findOneBy({ email });
+    return this.prisma.user.findUnique({
+      where: { email },
+    });
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
-    const user = await this.findOne(id);
-    if (!user) throw new Error('User not found');
-    console.log('In userService', updateUserDto);
-    Object.assign(user, updateUserDto);
-    return this.repo.save(user);
+  findOne(id: string) {
+    console.log('In User Service');
+    return this.prisma.user.findUnique({ where: { id } });
+  }
+
+  async update(authUserId: string, updateUserDto: UpdateUserDto) {
+    if (!Object.keys(updateUserDto).length) {
+      return null;
+    }
+    const { name, address, phone, state, city, zipCode, country } =
+      updateUserDto;
+    return await this.prisma.user.update({
+      where: { id: authUserId },
+      data: { name, address, phone, state, city, zipCode, country },
+    });
   }
 
   remove(id: number) {
