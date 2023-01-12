@@ -20,6 +20,6 @@ async function bootstrap() {
   //exception filter
   const { httpAdapter } = app.get(HttpAdapterHost);
   app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
-  await app.listen(5000);
+  await app.listen(5000, '0.0.0.0');
 }
 bootstrap();
