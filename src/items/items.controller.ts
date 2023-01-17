@@ -10,7 +10,13 @@ import {
 import { ItemsService } from './items.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { ItemEntity } from './entities/item.entity';
 
 @ApiTags('Items')
 @ApiBearerAuth()
@@ -18,17 +24,19 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 export class ItemsController {
   constructor(private readonly itemsService: ItemsService) {}
 
+  @ApiOkResponse({ status: 201, type: ItemEntity })
   @Post('new')
   create(@Body() createItemDto: CreateItemDto) {
     return this.itemsService.create(createItemDto);
   }
 
+  @ApiOkResponse({ status: 200, type: ItemEntity, isArray: true })
   @Get()
   findAll() {
-    console.log('Items Controller : ');
     return this.itemsService.findAll();
   }
 
+  @ApiOkResponse({ status: 200, type: ItemEntity })
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.itemsService.findOne(+id);

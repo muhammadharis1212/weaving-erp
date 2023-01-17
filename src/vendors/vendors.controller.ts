@@ -13,14 +13,7 @@ import {
 import { VendorsService } from './vendors.service';
 import { CreateVendorDto } from './dto/create-vendor.dto';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
-import {
-  ApiTags,
-  ApiBearerAuth,
-  ApiOkResponse,
-  ApiBody,
-  ApiParam,
-} from '@nestjs/swagger';
-import { FindAllVendorsDto } from './dto/findAll-vendors.dto';
+import { ApiTags, ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
 import { VendorEntity } from './entities/vendor.entity';
 import { DeleteVendorDto } from './dto/delete-vendor.dto';
 import { CurrentAuthUser } from 'src/users/decorators/current-auth-user.decorator';
@@ -39,7 +32,6 @@ export class VendorsController {
   @ApiOkResponse({ type: VendorEntity, isArray: true })
   @Get()
   findAll(@CurrentAuthUser('companyId') companyId: string) {
-    console.log('Get All vendors : ', companyId);
     return this.vendorsService.findAll(companyId);
   }
 

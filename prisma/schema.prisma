@@ -56,16 +56,22 @@ model Vendor {
 }
 
 model Item {
-  item_id        Int       @id @default(autoincrement())
-  item_name      String
-  item_sku       String
-  item_type      String
-  itemUnit       ItemUnit? @relation(fields: [item_unit], references: [unit_name], onDelete: Cascade, onUpdate: Cascade)
-  item_unit      String?
-  item_salePrice Int?
-  item_saleAcc   String?
-  item_cPrice    Int?
-  item_cAcc      String?
+  item_id                 Int             @id @default(autoincrement())
+  item_name               String
+  item_sku                String          @unique
+  item_type               String
+  itemUnit                ItemUnit?       @relation(fields: [item_unit_name], references: [unit_name], onDelete: Cascade, onUpdate: Cascade)
+  item_unit_name          String?
+  item_SalePrice          Decimal         @db.Decimal(10, 2)
+  chart_SaleAcc           ChartOfAccounts @relation("chart_SaleAcc", fields: [item_SaleAccId], references: [id])
+  item_SaleAccId          Int
+  item_CostPrice          Decimal         @db.Decimal(10, 2)
+  chart_CostAcc           ChartOfAccounts @relation("chart_CostAcc", fields: [item_CostAccId], references: [id])
+  item_CostAccId          Int
+  chart_inventory_Account ChartOfAccounts @relation("chart_inventory_Account", fields: [inventoryAccount], references: [id])
+  inventoryAccount        Int             @default(dbgenerated("3"))
+  createdAt               DateTime        @default(now())
+  updatedAt               DateTime        @default(now())
 }
 
 // 
@@ -92,11 +98,56 @@ model AccountGroup {
 }
 
 model ChartOfAccounts {
-  id             Int          @id @unique
-  name           String       @unique
-  isArchived     Boolean      @default(false)
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @default(now())
-  group          AccountGroup @relation(fields: [accountGroupId], references: [id], onUpdate: Cascade)
-  accountGroupId Int
+  id              Int             @id @default(autoincrement())
+  name            String          @unique
+  code            String?
+  isArchived      Boolean         @default(false)
+  description     String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @default(now())
+  group           AccountGroup    @relation(fields: [accountGroupId], references: [id], onUpdate: Cascade)
+  accountGroupId  Int
+  saleAcc         Item[]          @relation("chart_SaleAcc")
+  costAcc         Item[]          @relation("chart_CostAcc")
+  invAcc          Item[]          @relation("chart_inventory_Account")
+  generalLedgerId GeneralLedger[]
+}
+
+model AccountingPeriod {
+  id        Int      @id @default(autoincrement())
+  startDate DateTime @db.Date
+  endDate   DateTime @db.Date
+}
+
+model Transaction {
+  id            Int             @id @default(autoincrement())
+  t_date        DateTime        @db.Date
+  entryDate     DateTime        @db.Date
+  description   String
+  //transDetail   TransactionDetail[]
+  //transDetailId Int
+  generalLedger GeneralLedger[]
+
+  @@index([t_date])
+}
+
+// model TransactionDetail {
+//   seqId         Int         @id @db.SmallInt
+//   amount        Decimal     @db.Decimal(20, 2)
+//   dcFlag        String      @db.Bit(1)
+//   transaction   Transaction @relation(fields: [transactionId], references: [id])
+//   transactionId Int
+// }
+
+model GeneralLedger {
+  seqId          Int             @default(autoincrement())
+  transaction    Transaction     @relation(fields: [transactionId], references: [id])
+  transactionId  Int
+  account        ChartOfAccounts @relation(fields: [chartAccountId], references: [id])
+  chartAccountId Int
+  amount         Decimal         @db.Decimal(20, 2)
+  dcFlag         String          @db.Bit(1)
+
+  @@id([seqId, transactionId])
+  @@index([seqId, transactionId, chartAccountId])
 }

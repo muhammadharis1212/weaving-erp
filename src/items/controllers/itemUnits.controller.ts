@@ -15,7 +15,6 @@ export class ItemUnitsController {
   }
   @Get('all')
   findAllUnits() {
-    console.log('Items Unit Controller :');
     return this.itemUnitService.findAll();
   }
 }
