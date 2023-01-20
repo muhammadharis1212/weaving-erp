@@ -22,7 +22,7 @@ model User {
 }
 
 model Company {
-  id      String   @id @default(uuid())
+  id      String  @id @default(uuid())
   email   String?
   name    String
   address String?
@@ -32,27 +32,48 @@ model Company {
   zipCode String?
   country String?
   taxNo   String?
-  user    User     @relation(fields: [userId], references: [id])
-  userId  String   @unique // relation scalar field (used in the `@relation` attribute above)
-  vendors Vendor[]
+  user    User    @relation(fields: [userId], references: [id])
+  userId  String  @unique // relation scalar field (used in the `@relation` attribute above)
 }
 
-model Vendor {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String?
-  address   String?
-  phone     String?
-  state     String?
-  city      String?
-  zipCode   String?
-  country   String?
-  reference String?
-  taxNo     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  companyId String
+model Party {
+  id           Int           @id @default(autoincrement())
+  individual   Individual?
+  organization Organization?
+  partyRole    PartyRole[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Individual {
+  id         Int     @id @default(autoincrement())
+  title      String?
+  firstName  String
+  middleName String?
+  lastName   String?
+  gender     String?
+  nationalId String?
+  comment    String?
+  party      Party   @relation(fields: [partyId], references: [id])
+  partyId    Int     @unique
+}
+
+model Organization {
+  id      Int     @id @default(autoincrement())
+  name    String
+  taxIdNo String?
+  party   Party   @relation(fields: [partyId], references: [id])
+  partyId Int     @unique
+}
+
+model PartyRole {
+  id       Int       @default(autoincrement())
+  fromDate DateTime?
+  thruDate DateTime?
+  party    Party     @relation(fields: [partyId], references: [id])
+  partyId  Int
+
+  @@id([id, partyId])
 }
 
 model Item {
@@ -83,17 +104,17 @@ model ItemUnit {
 }
 
 model RootAccType {
-  rType String         @id @unique @db.Text
+  id    Int            @id @unique
+  name  String         @unique
   group AccountGroup[]
-
-  @@index([rType])
 }
 
 model AccountGroup {
   id              Int               @id @default(autoincrement())
-  name            String            @unique @db.VarChar(50)
-  rootType        RootAccType       @relation(fields: [rootTypeId], references: [rType], onUpdate: Cascade)
-  rootTypeId      String
+  name            String            @unique
+  description     String?
+  rootType        RootAccType       @relation(fields: [rootTypeId], references: [id])
+  rootTypeId      Int
   chartOfAccounts ChartOfAccounts[]
 }
 
@@ -103,6 +124,7 @@ model ChartOfAccounts {
   code            String?
   isArchived      Boolean         @default(false)
   description     String?
+  accountNo       String?
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @default(now())
   group           AccountGroup    @relation(fields: [accountGroupId], references: [id], onUpdate: Cascade)
@@ -150,4 +172,12 @@ model GeneralLedger {
 
   @@id([seqId, transactionId])
   @@index([seqId, transactionId, chartAccountId])
+}
+
+model AccountBalance {
+  id            Int    @id @default(autoincrement())
+  charAccountId Int
+  companyId     String
+  monthId       Int
+  acctgPeriodId Int
 }

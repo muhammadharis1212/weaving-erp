@@ -1,28 +1,33 @@
 /* eslint-disable prettier/prettier */
 import { PrismaClient } from '@prisma/client';
 import { accountGroups } from './accountGroups';
+import { chartOfAccounts } from './chartOfAccounts';
 const prisma = new PrismaClient();
 async function main() {
   const accountTypes = await prisma.rootAccType.createMany({
     data: [
-      { rType: 'Assets' },
-      { rType: 'Liabilities' },
-      { rType: 'Revenues' },
-      { rType: 'Equity' },
-      { rType: 'Expenses' },
+      { id: 1, name: 'Assets' },
+      { id: 2, name: 'Liabilities' },
+      { id: 3, name: 'Equity' },
+      { id: 4, name: 'Revenue' },
+      { id: 5, name: 'Expenses' },
     ],
     skipDuplicates: true,
   });
   console.log(accountTypes);
-
   for (const group of accountGroups) {
     await prisma.accountGroup.create({
       data: {
         name: group.name,
-        rootType: { connect: { rType: group.type } },
+        rootType: { connect: { id: group.rootId } },
       },
     });
   }
+  const chartAccounts = await prisma.chartOfAccounts.createMany({
+    data: chartOfAccounts,
+    skipDuplicates: true,
+  });
+  console.log(chartAccounts);
 }
 
 main()

@@ -1,13 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateChartofaccountDto } from './dto/create-chartofaccount.dto';
+import { CreateChartOfAccountDto } from './dto/create-chartofaccount.dto';
 import { UpdateChartofaccountDto } from './dto/update-chartofaccount.dto';
 
 @Injectable()
 export class ChartofaccountsService {
   constructor(private prisma: PrismaService) {}
-  create(createChartofaccountDto: CreateChartofaccountDto) {
-    return 'This action adds a new chartofaccount';
+  create(createChartOfAccountDto: CreateChartOfAccountDto) {
+    return this.prisma.chartOfAccounts.create({
+      data: { ...createChartOfAccountDto },
+    });
   }
 
   findAll() {
@@ -26,5 +28,10 @@ export class ChartofaccountsService {
 
   remove(id: number) {
     return `This action removes a #${id} chartofaccount`;
+  }
+  async findAllGroups() {
+    return await this.prisma.accountGroup.findMany({
+      include: { rootType: true },
+    });
   }
 }

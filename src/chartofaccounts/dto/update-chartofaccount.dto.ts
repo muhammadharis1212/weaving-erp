@@ -1,4 +1,6 @@
 import { PartialType } from '@nestjs/swagger';
-import { CreateChartofaccountDto } from './create-chartofaccount.dto';
+import { CreateChartOfAccountDto } from './create-chartofaccount.dto';
 
-export class UpdateChartofaccountDto extends PartialType(CreateChartofaccountDto) {}
+export class UpdateChartofaccountDto extends PartialType(
+  CreateChartOfAccountDto,
+) {}

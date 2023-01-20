@@ -32,27 +32,23 @@ CREATE TABLE "Transaction" (
 
 -- CreateTable
 CREATE TABLE "GeneralLedger" (
-    "id" SERIAL NOT NULL,
-    "seqId" SMALLINT NOT NULL,
+    "seqId" SERIAL NOT NULL,
     "transactionId" INTEGER NOT NULL,
     "chartAccountId" INTEGER NOT NULL,
     "amount" DECIMAL(20,2) NOT NULL,
     "dcFlag" BIT(1) NOT NULL,
 
-    CONSTRAINT "GeneralLedger_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "GeneralLedger_pkey" PRIMARY KEY ("seqId","transactionId")
 );
 
 -- CreateIndex
 CREATE INDEX "Transaction_t_date_idx" ON "Transaction"("t_date");
 
 -- CreateIndex
-CREATE INDEX "GeneralLedger_id_transactionId_chartAccountId_idx" ON "GeneralLedger"("id", "transactionId", "chartAccountId");
+CREATE INDEX "GeneralLedger_seqId_transactionId_chartAccountId_idx" ON "GeneralLedger"("seqId", "transactionId", "chartAccountId");
 
 -- AddForeignKey
 ALTER TABLE "GeneralLedger" ADD CONSTRAINT "GeneralLedger_transactionId_fkey" FOREIGN KEY ("transactionId") REFERENCES "Transaction"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "GeneralLedger" ADD CONSTRAINT "GeneralLedger_chartAccountId_fkey" FOREIGN KEY ("chartAccountId") REFERENCES "ChartOfAccounts"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "GeneralLedger" ADD CONSTRAINT "GeneralLedger_seqId_fkey" FOREIGN KEY ("seqId") REFERENCES "GeneralLedger"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

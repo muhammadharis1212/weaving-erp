@@ -7,25 +7,31 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ChartofaccountsService } from './chartofaccounts.service';
-import { CreateChartofaccountDto } from './dto/create-chartofaccount.dto';
+import { CreateChartOfAccountDto } from './dto/create-chartofaccount.dto';
 import { UpdateChartofaccountDto } from './dto/update-chartofaccount.dto';
 
-@Controller('chart-of-accounts')
+@ApiTags('Chart Of Accounts')
+@ApiBearerAuth()
+@Controller('chartofaccounts')
 export class ChartofaccountsController {
   constructor(
     private readonly chartofaccountsService: ChartofaccountsService,
   ) {}
 
   @Post('create')
-  create(@Body() createChartofaccountDto: CreateChartofaccountDto) {
-    return this.chartofaccountsService.create(createChartofaccountDto);
+  create(@Body() createChartOfAccountDto: CreateChartOfAccountDto) {
+    return this.chartofaccountsService.create(createChartOfAccountDto);
   }
 
   @Get()
   findAll() {
     return this.chartofaccountsService.findAll();
+  }
+  @Get('groups')
+  groups() {
+    return this.chartofaccountsService.findAllGroups();
   }
 
   @Get(':id')
