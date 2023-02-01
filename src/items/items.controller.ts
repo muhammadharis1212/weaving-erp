@@ -17,7 +17,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ItemEntity } from './entities/item.entity';
+import { SkipAuth } from 'src/auth/constants/constants';
 
+@SkipAuth()
 @ApiTags('Items')
 @ApiBearerAuth()
 @Controller()

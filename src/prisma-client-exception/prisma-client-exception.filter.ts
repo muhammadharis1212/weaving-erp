@@ -6,7 +6,7 @@ import { Response } from 'express';
 @Catch(Prisma.PrismaClientKnownRequestError)
 export class PrismaClientExceptionFilter extends BaseExceptionFilter {
   catch(exception: Prisma.PrismaClientKnownRequestError, host: ArgumentsHost) {
-    console.error(exception.message);
+    console.log('In Exception filter');
     const context = host.switchToHttp();
     const response = context.getResponse<Response>();
     const message = exception.message.replace(/\n/g, '');
@@ -36,6 +36,7 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
       }
       default:
         // default 500 error code
+        console.log('In Exception filter Default');
         super.catch(exception, host);
         break;
     }

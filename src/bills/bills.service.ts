@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateBillDto } from './dto/create-bill.dto';
 import { UpdateBillDto } from './dto/update-bill.dto';
 
 @Injectable()
 export class BillsService {
+  constructor(private prisma: PrismaService) {}
   create(createBillDto: CreateBillDto) {
-    return 'This action adds a new bill';
+    return this.prisma.bill.create({ data: { ...createBillDto } });
   }
 
   findAll() {

@@ -7,12 +7,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CompanyModule } from './company/company.module';
 
 import { PrismaModule } from './prisma/prisma.module';
-import { VendorsModule } from './vendors/vendors.module';
 import { ChartofaccountsModule } from './chartofaccounts/chartofaccounts.module';
 import { BillsModule } from './bills/bills.module';
 import { ItemsModule } from './items/items.module';
-import { APP_GUARD, RouterModule } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, RouterModule } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { PartyModule } from './party/party.module';
+import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter';
 
 @Module({
   imports: [
@@ -25,11 +26,11 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
     }),
     CompanyModule,
     PrismaModule,
-    VendorsModule,
     ChartofaccountsModule,
     BillsModule,
     ItemsModule,
     RouterModule.register([{ path: 'items', module: ItemsModule }]),
+    PartyModule,
   ],
   controllers: [AppController],
   providers: [
@@ -38,6 +39,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
+    { provide: APP_FILTER, useClass: PrismaClientExceptionFilter },
   ],
 })
 export class AppModule {}

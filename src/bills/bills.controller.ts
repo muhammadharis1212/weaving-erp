@@ -1,13 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
+import { SkipAuth } from 'src/auth/constants/constants';
 import { BillsService } from './bills.service';
 import { CreateBillDto } from './dto/create-bill.dto';
 import { UpdateBillDto } from './dto/update-bill.dto';
 
+@SkipAuth()
 @Controller('bills')
 export class BillsController {
   constructor(private readonly billsService: BillsService) {}
 
-  @Post()
+  @Post('new')
   create(@Body() createBillDto: CreateBillDto) {
     return this.billsService.create(createBillDto);
   }

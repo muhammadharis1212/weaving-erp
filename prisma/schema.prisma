@@ -37,70 +37,122 @@ model Company {
 }
 
 model Party {
-  id           Int           @id @default(autoincrement())
-  individual   Individual?
-  organization Organization?
-  partyRole    PartyRole[]
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-}
-
-model Individual {
-  id         Int     @id @default(autoincrement())
-  title      String?
+  id         Int       @id @default(autoincrement())
+  salutation String?
   firstName  String
-  middleName String?
   lastName   String?
-  gender     String?
-  nationalId String?
+  email      String?
   comment    String?
-  party      Party   @relation(fields: [partyId], references: [id])
-  partyId    Int     @unique
+  role       String
+  type       String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  address    Address[]
+  contact    Contact[]
+  Bill       Bill[]
 }
 
-model Organization {
+model Address {
+  id           Int      @id @default(autoincrement())
+  party        Party    @relation(fields: [partyId], references: [id])
+  partyId      Int
+  addressLine1 String?
+  addressLine2 String?
+  city         String?
+  state        String?
+  country      String?
+  postalCode   String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Contact {
   id      Int     @id @default(autoincrement())
-  name    String
-  taxIdNo String?
   party   Party   @relation(fields: [partyId], references: [id])
-  partyId Int     @unique
-}
-
-model PartyRole {
-  id       Int       @default(autoincrement())
-  fromDate DateTime?
-  thruDate DateTime?
-  party    Party     @relation(fields: [partyId], references: [id])
-  partyId  Int
-
-  @@id([id, partyId])
+  partyId Int
+  phone   String?
 }
 
 model Item {
-  item_id                 Int             @id @default(autoincrement())
+  item_id                 Int                 @id @default(autoincrement())
   item_name               String
-  item_sku                String          @unique
+  item_sku                String              @unique
   item_type               String
-  itemUnit                ItemUnit?       @relation(fields: [item_unit_name], references: [unit_name], onDelete: Cascade, onUpdate: Cascade)
+  itemUnit                ItemUnit?           @relation(fields: [item_unit_name], references: [unit_name], onDelete: Cascade, onUpdate: Cascade)
   item_unit_name          String?
-  item_SalePrice          Decimal         @db.Decimal(10, 2)
-  chart_SaleAcc           ChartOfAccounts @relation("chart_SaleAcc", fields: [item_SaleAccId], references: [id])
+  item_SalePrice          Decimal             @db.Decimal(10, 2)
+  chart_SaleAcc           ChartOfAccounts     @relation("chart_SaleAcc", fields: [item_SaleAccId], references: [id])
   item_SaleAccId          Int
-  item_CostPrice          Decimal         @db.Decimal(10, 2)
-  chart_CostAcc           ChartOfAccounts @relation("chart_CostAcc", fields: [item_CostAccId], references: [id])
+  item_CostPrice          Decimal             @db.Decimal(10, 2)
+  chart_CostAcc           ChartOfAccounts     @relation("chart_CostAcc", fields: [item_CostAccId], references: [id])
   item_CostAccId          Int
-  chart_inventory_Account ChartOfAccounts @relation("chart_inventory_Account", fields: [inventoryAccount], references: [id])
-  inventoryAccount        Int             @default(dbgenerated("3"))
-  createdAt               DateTime        @default(now())
-  updatedAt               DateTime        @default(now())
+  chart_inventory_Account ChartOfAccounts     @relation("chart_inventory_Account", fields: [inventoryAccount], references: [id])
+  inventoryAccount        Int                 @default(dbgenerated("3"))
+  createdAt               DateTime            @default(now())
+  updatedAt               DateTime            @updatedAt
+  discontinueDate         DateTime            @db.Date
+  CategoriesOnItems       CategoriesOnItems[]
+  Warehouse               Warehouse?          @relation(fields: [warehouseId], references: [id])
+  warehouseId             Int?
+  BillItem                BillItem[]
 }
 
-// 
+model CategoriesOnItems {
+  item       Item         @relation(fields: [itemId], references: [item_id])
+  itemId     Int
+  category   ItemCategory @relation(fields: [categoryId], references: [id])
+  categoryId Int
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  @@id([itemId, categoryId])
+}
+
+model ItemCategory {
+  id                Int                 @id @default(autoincrement())
+  name              String
+  CategoriesOnItems CategoriesOnItems[]
+}
+
 //related to item
 model ItemUnit {
   unit_id   Int    @id @default(autoincrement())
   unit_name String @unique
   Item      Item[]
+}
+
+model Warehouse {
+  id   Int    @id @default(autoincrement())
+  name String
+  Item Item[]
+}
+
+model Bill {
+  id                Int       @id @default(autoincrement())
+  Supplier          Party     @relation(fields: [supplierId], references: [id])
+  supplierId        Int
+  status            String    @default("Draft")
+  billDate          DateTime? @db.Date
+  billDueDate       DateTime? @db.Date
+  billNo            String
+  paymentTerms      Int       @default(0)
+  paymentTermsLabel String?
+  dueByDays         String?
+  dueInDays         Int?
+
+  BillItem BillItem[]
+}
+
+model BillItem {
+  id       Int     @default(autoincrement())
+  bill     Bill    @relation(fields: [billId], references: [id])
+  billId   Int
+  item     Item    @relation(fields: [itemId], references: [item_id])
+  itemId   Int
+  quantity Decimal @db.Decimal()
+  rate     Decimal @db.Decimal()
+
+  @@id([id, itemId])
 }
 
 model RootAccType {
