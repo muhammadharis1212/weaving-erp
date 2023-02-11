@@ -9,11 +9,11 @@ export class ItemUnitsService {
   create(createUnitDto: CreateItemUnitDto) {
     const { unit_name } = createUnitDto;
     const lowerCase = unit_name?.toLowerCase();
-    return this.prisma.itemUnit.create({ data: { unit_name: lowerCase } });
+    return this.prisma.uOM.create({ data: { unit_name: lowerCase } });
   }
   async findAll() {
     console.log('FindAll');
-    return await this.prisma.itemUnit.findMany({
+    return await this.prisma.uOM.findMany({
       orderBy: [{ unit_name: 'asc' }],
     });
   }

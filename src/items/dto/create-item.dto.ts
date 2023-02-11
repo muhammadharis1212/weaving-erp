@@ -1,10 +1,9 @@
 import {
+  IsDecimal,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
-  Max,
-  Min,
 } from 'class-validator';
 
 export class CreateItemDto {
@@ -22,25 +21,33 @@ export class CreateItemDto {
 
   @IsString()
   @IsOptional()
-  item_unit_name: string;
+  unit_name: string;
 
   @IsNotEmpty()
-  @IsNumber({ maxDecimalPlaces: 2 })
-  @Min(0.01)
-  @Max(9999999999.99)
-  item_SalePrice: number;
-
-  @IsNotEmpty()
-  @IsNumber()
-  item_SaleAccId: number;
-
-  @IsNotEmpty()
-  @IsNumber({ maxDecimalPlaces: 2 })
-  @Min(0.01)
-  @Max(9999999999.99)
-  item_CostPrice: number;
+  @IsNumber({ maxDecimalPlaces: 10 })
+  salePrice: number;
 
   @IsNotEmpty()
   @IsNumber()
-  item_CostAccId: number;
+  saleAccountId: number;
+
+  @IsNotEmpty()
+  @IsNumber({ maxDecimalPlaces: 10 })
+  purchasePrice: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  purchaseAccountId: number;
+
+  @IsOptional()
+  @IsNumber()
+  warehouseId: number;
+
+  @IsOptional()
+  @IsNumber()
+  openingStock: number;
+
+  @IsOptional()
+  @IsNumber()
+  openingStockValue: number;
 }

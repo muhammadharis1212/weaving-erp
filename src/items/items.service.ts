@@ -7,28 +7,7 @@ import { UpdateItemDto } from './dto/update-item.dto';
 export class ItemsService {
   constructor(private prisma: PrismaService) {}
   create(createItemDto: CreateItemDto) {
-    // const {
-    //   item_name,
-    //   item_sku,
-    //   item_type,
-    //   item_unit_name,
-    //   item_CostPrice,
-    //   item_SalePrice,
-    //   item_SaleAccId,
-    //   item_CostAccId,
-    // } = createItemDto;
-    // return this.prisma.item.create({
-    //   data: {
-    //     item_name,
-    //     item_sku,
-    //     item_type,
-    //     item_unit_name,
-    //     item_CostPrice,
-    //     item_SalePrice,
-    //     item_SaleAccId,
-    //     item_CostAccId,
-    //   },
-    // });
+    return this.prisma.item.create({ data: { ...createItemDto } });
   }
 
   findAll() {

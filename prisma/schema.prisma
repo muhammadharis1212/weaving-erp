@@ -37,19 +37,20 @@ model Company {
 }
 
 model Party {
-  id         Int       @id @default(autoincrement())
-  salutation String?
-  firstName  String
-  lastName   String?
-  email      String?
-  comment    String?
-  role       String
-  type       String
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  address    Address[]
-  contact    Contact[]
-  Bill       Bill[]
+  id          Int             @id @default(autoincrement())
+  salutation  String?
+  firstName   String
+  lastName    String?
+  email       String?
+  comment     String?
+  role        String
+  type        String
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  address     Address[]
+  contact     Contact[]
+  Bill        Bill[]
+  ledgerEntry GeneralLedger[]
 }
 
 model Address {
@@ -74,27 +75,29 @@ model Contact {
 }
 
 model Item {
-  item_id                 Int                 @id @default(autoincrement())
-  item_name               String
-  item_sku                String              @unique
-  item_type               String
-  itemUnit                ItemUnit?           @relation(fields: [item_unit_name], references: [unit_name], onDelete: Cascade, onUpdate: Cascade)
-  item_unit_name          String?
-  item_SalePrice          Decimal             @db.Decimal(10, 2)
-  chart_SaleAcc           ChartOfAccounts     @relation("chart_SaleAcc", fields: [item_SaleAccId], references: [id])
-  item_SaleAccId          Int
-  item_CostPrice          Decimal             @db.Decimal(10, 2)
-  chart_CostAcc           ChartOfAccounts     @relation("chart_CostAcc", fields: [item_CostAccId], references: [id])
-  item_CostAccId          Int
-  chart_inventory_Account ChartOfAccounts     @relation("chart_inventory_Account", fields: [inventoryAccount], references: [id])
-  inventoryAccount        Int                 @default(dbgenerated("3"))
-  createdAt               DateTime            @default(now())
-  updatedAt               DateTime            @updatedAt
-  discontinueDate         DateTime            @db.Date
-  CategoriesOnItems       CategoriesOnItems[]
-  Warehouse               Warehouse?          @relation(fields: [warehouseId], references: [id])
-  warehouseId             Int?
-  BillItem                BillItem[]
+  item_id            Int                 @id @default(autoincrement())
+  item_name          String
+  item_sku           String              @unique
+  item_type          String
+  uom                UOM?                @relation(fields: [unit_name], references: [unit_name], onDelete: Cascade, onUpdate: Cascade)
+  unit_name          String?
+  salePrice          Decimal?
+  saleAccount        ChartOfAccounts?    @relation("chart_SaleAcc", fields: [saleAccountId], references: [id])
+  saleAccountId      Int?
+  purchasePrice      Decimal?
+  purchaseAccount    ChartOfAccounts?    @relation("chart_CostAcc", fields: [purchaseAccountId], references: [id])
+  purchaseAccountId  Int?
+  inventoryAccount   ChartOfAccounts     @relation("chart_inventory_Account", fields: [inventoryAccountId], references: [id])
+  inventoryAccountId Int                 @default(dbgenerated("3"))
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  discontinueDate    DateTime?           @db.Date
+  CategoriesOnItems  CategoriesOnItems[]
+  Warehouse          Warehouse?          @relation(fields: [warehouseId], references: [id])
+  warehouseId        Int?
+  openingStock       Decimal?
+  openingStockValue  Decimal?
+  BillItems          BillItems[]
 }
 
 model CategoriesOnItems {
@@ -115,7 +118,7 @@ model ItemCategory {
 }
 
 //related to item
-model ItemUnit {
+model UOM {
   unit_id   Int    @id @default(autoincrement())
   unit_name String @unique
   Item      Item[]
@@ -128,22 +131,27 @@ model Warehouse {
 }
 
 model Bill {
-  id                Int       @id @default(autoincrement())
-  Supplier          Party     @relation(fields: [supplierId], references: [id])
+  id                Int              @id @default(autoincrement())
+  Supplier          Party            @relation(fields: [supplierId], references: [id])
   supplierId        Int
-  status            String    @default("Draft")
-  billDate          DateTime? @db.Date
-  billDueDate       DateTime? @db.Date
+  status            String           @default("Draft")
+  billDate          DateTime?        @db.Date
+  billDueDate       DateTime?        @db.Date
   billNo            String
-  paymentTerms      Int       @default(0)
+  paymentTerms      Int              @default(0)
   paymentTermsLabel String?
   dueByDays         String?
   dueInDays         Int?
-
-  BillItem BillItem[]
+  subTotal          Decimal          @default(0) @db.Decimal(30, 2)
+  total             Decimal          @default(0) @db.Decimal(30, 2)
+  outStandingAmount Decimal          @default(0) @db.Decimal(30, 2)
+  accountPayable    ChartOfAccounts? @relation(fields: [accountPayableId], references: [id])
+  accountPayableId  Int?
+  BillItems         BillItems[]
+  transaction       Transaction[]
 }
 
-model BillItem {
+model BillItems {
   id       Int     @default(autoincrement())
   bill     Bill    @relation(fields: [billId], references: [id])
   billId   Int
@@ -171,20 +179,21 @@ model AccountGroup {
 }
 
 model ChartOfAccounts {
-  id              Int             @id @default(autoincrement())
-  name            String          @unique
-  code            String?
-  isArchived      Boolean         @default(false)
-  description     String?
-  accountNo       String?
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @default(now())
-  group           AccountGroup    @relation(fields: [accountGroupId], references: [id], onUpdate: Cascade)
-  accountGroupId  Int
-  saleAcc         Item[]          @relation("chart_SaleAcc")
-  costAcc         Item[]          @relation("chart_CostAcc")
-  invAcc          Item[]          @relation("chart_inventory_Account")
-  generalLedgerId GeneralLedger[]
+  id             Int             @id @default(autoincrement())
+  name           String          @unique
+  code           String?
+  isArchived     Boolean         @default(false)
+  description    String?
+  accountNo      String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @default(now())
+  group          AccountGroup    @relation(fields: [accountGroupId], references: [id], onUpdate: Cascade)
+  accountGroupId Int
+  saleAcc        Item[]          @relation("chart_SaleAcc")
+  costAcc        Item[]          @relation("chart_CostAcc")
+  invAcc         Item[]          @relation("chart_inventory_Account")
+  ledgerEntry    GeneralLedger[]
+  bill           Bill[]
 }
 
 model AccountingPeriod {
@@ -195,35 +204,30 @@ model AccountingPeriod {
 
 model Transaction {
   id            Int             @id @default(autoincrement())
-  t_date        DateTime        @db.Date
-  entryDate     DateTime        @db.Date
-  description   String
-  //transDetail   TransactionDetail[]
-  //transDetailId Int
+  transacDate   DateTime        @db.Date
+  description   String?
+  transacType   String?
+  bill          Bill?           @relation(fields: [billId], references: [id])
+  billId        Int
   generalLedger GeneralLedger[]
 
-  @@index([t_date])
+  @@index([transacDate])
 }
 
-// model TransactionDetail {
-//   seqId         Int         @id @db.SmallInt
-//   amount        Decimal     @db.Decimal(20, 2)
-//   dcFlag        String      @db.Bit(1)
-//   transaction   Transaction @relation(fields: [transactionId], references: [id])
-//   transactionId Int
-// }
-
 model GeneralLedger {
-  seqId          Int             @default(autoincrement())
+  id             Int             @default(autoincrement())
   transaction    Transaction     @relation(fields: [transactionId], references: [id])
   transactionId  Int
   account        ChartOfAccounts @relation(fields: [chartAccountId], references: [id])
   chartAccountId Int
+  party          Party           @relation(fields: [partyId], references: [id])
+  partyId        Int
   amount         Decimal         @db.Decimal(20, 2)
   dcFlag         String          @db.Bit(1)
 
-  @@id([seqId, transactionId])
-  @@index([seqId, transactionId, chartAccountId])
+  //0 for debit and 1 for credit
+  @@id([id, transactionId])
+  @@index([id, transactionId, chartAccountId])
 }
 
 model AccountBalance {

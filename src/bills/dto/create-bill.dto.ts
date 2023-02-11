@@ -1,9 +1,14 @@
+import { Type } from 'class-transformer';
 import {
   IsDate,
+  IsDateString,
+  IsDecimal,
+  IsISO8601,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
+  ValidateNested,
 } from 'class-validator';
 
 export class CreateBillDto {
@@ -15,12 +20,12 @@ export class CreateBillDto {
   @IsString()
   status: string;
 
-  @IsOptional()
-  @IsDate()
+  @IsISO8601()
+  @IsNotEmpty()
   billDate: Date;
 
   @IsOptional()
-  @IsDate()
+  @IsDateString()
   billDueDate: Date;
 
   @IsString()
@@ -28,7 +33,7 @@ export class CreateBillDto {
   billNo: string;
 
   @IsNumber()
-  @IsNotEmpty()
+  @IsOptional()
   paymentTerms: number;
 
   @IsString()
@@ -42,4 +47,42 @@ export class CreateBillDto {
   @IsNumber()
   @IsOptional()
   dueInDays: number;
+
+  // @IsString()
+  // @IsOptional()
+  // notes: string;
+
+  @ValidateNested({ each: true })
+  @Type(() => BillItems)
+  billItems: BillItems[];
+}
+
+class BillItems {
+  @IsNotEmpty()
+  @IsNumber()
+  itemId: number;
+
+  @IsString()
+  @IsOptional()
+  name: string;
+  // "account_id": "460000000000403",
+
+  @IsNotEmpty()
+  @IsNumber({ maxDecimalPlaces: 10 })
+  rate: number;
+
+  //"warehouse_id": 460000000038089,
+
+  @IsNotEmpty()
+  @IsNumber({ maxDecimalPlaces: 10 })
+  quantity: number;
+
+  //item_order:
+
+  @IsOptional()
+  @IsString()
+  //denotes wether a product is goods or service.
+  productType: string;
+
+  //"unit": "kgs",
 }
